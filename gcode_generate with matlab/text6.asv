@@ -1,0 +1,260 @@
+clear all;
+clc;
+close all;
+ 
+fid = fopen('ZAR.gcode');
+% gcode_file={ }; gcode_file=zeros(length(j),4)
+j=1;
+line =0; % line number to reach errors.
+%  while ischar(tline) %Check if row is character array or not 
+ while ischar('G') % while the line includes G0 do following
+       
+       tline=fgetl(fid); % Read fid file line by line.
+       line =line+1;
+       if contains(tline,'F') && size(str2double(regexp(tline,'[\d.]+','match')),2)==5  % [\d.] formatting operator decimal notation 
+                
+                if contains(tline,'Z')
+                    coord=str2double(regexp(tline,'[\d.]+','match'));
+                    coordinates1(j,:)=coord(1,3:5);
+                    coordz=coord(1,5);
+                    A(j,1)=coordz;  % Changed z values for plotting layer by layer 
+                    j=j+1;
+                else 
+                    coord1=str2double(regexp(tline,'[\d.]+','match'));
+                    coordinates1(j,:)=coord1(1,3:5);
+                    coordinates1(j,3)=coordz;
+                    j=j+1;
+                end
+       end
+       
+       
+              
+     if contains(tline,'X') && size(str2double(regexp(tline,'[\d.]+','match')),2)==4 && contains(tline,';')~=1 && contains(tline,'F')~=1 
+             
+      
+          if contains(tline,'Z')
+               coord2=str2double(regexp(tline,'[\d.]+','match'));
+               coordinates1(j,:)=coord2(1,2:4);
+               coordz=coord2(1,4) ; % [coord3(1,2);coord3(1,3),coord(1,5)] z'yi çekebilmek için 
+               A(j,1)=coordz;
+               j=j+1;
+           else 
+               coord3=str2double(regexp(tline,'[\d.]+','match'));
+               coordinates1(j,:)=coord3(1,2:4);
+               coordinates1(j,3)=coordz;
+                    j=j+1;
+           end
+      end
+     if contains(tline,';End of Gcode')
+         break
+     end
+              
+ end
+
+%Find layer thickness and create matrix 
+Z=find(A(:,1)~=0); % find point that z not equal to zero 
+for i=1:size(Z)
+    Zline(:,1)=A(Z(:,1),1); % Layer thicness value 
+end
+    
+    k=1;
+for i=1:size(Zline)
+    figure(i)
+    
+    plot3(coordinates1(Z(k,1):Z(k+1,1),1),coordinates1(Z(k):Z(k+1),2),coordinates1(Z(k,1):Z(k+1,1),3))
+    k=k+1;
+  
+end
+
+ print(gcf,'Toolpath.png','-dpng') % get current figure and print png format 
+ 
+ for i=1:size(coordinates1)
+    figure(i);
+    
+    coord3(i,:)=(coordinates1(Z(k,1):Z(k+1,1),1),coordinates1(Z(k):Z(k+1),2)
+    k=k+1;
+  
+end
+    %  for i=1:size(A)
+%      if A(i,1)~=0 
+%         Z(k,1)=A(i,1)
+%      end
+%      k=k+1;
+%  end 
+        
+     
+     
+     
+ for i=1:size(coordinates1,1)
+         plot3(coordinates1(:,1),coordinates1(:,2),coordinates1(:,3))
+         rotate3d on
+         xlabel('x'),ylabel('y'),zlabel('z')
+       
+     
+            
+            
+%          if coordinates1(i,3)~=coordinates1(i+1,3)
+%             figure(2)
+%             axis ([150 175 110 130 0.1 0.4])
+%             hold on 
+%             plot3(coordinates1(:,1),coordinates1(:,2),coordinates1(:,3))
+%             rotate3d on
+%             end
+    break 
+ end 
+ 
+% for i=1:size(Z)
+%     
+%     for k=Z(i,1):Z(i+1,1)
+%     coordz_03(Z(i,1):Z(i+1,1),1:2)=coordinates1(Z(i,1):Z(i+1,1),1:2);
+%     
+     
+ end
+end
+
+
+ i=1;
+while 1
+    
+%     i=1:size(coordinates1)
+   if coordinates1(i,3) == 0.3
+ 
+    coordz_03(i,:)=coordinates1(i,1:2);
+    i=i+1;   
+   else 
+           break
+   end
+end
+
+
+i=1;  
+while 1
+   
+%     i=1:size(coordinates1)
+   if coordinates1(i,3) == 0.5
+     coordz_05(i,:)=coordinates1(i,1:2);
+      i=i+1; 
+%   else 
+%             break
+   end
+   
+end
+
+i=1;  
+while 1
+   
+%     i=1:size(coordinates1)
+   if coordinates1(i,3) == 0.7
+     coordz_07(i,:)=coordinates1(i,1:2);
+      i=i+1; 
+  
+   end
+   
+end
+
+
+        
+    
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+%  fid = fopen('1p5mm.gcode');
+%  j=1;
+% line =0; % line number to reach errors.
+% %  while ischar(tline) %Check if row is character array or not 
+%  while ischar('G') % while the line includes G0 do following
+%        
+%        tline=fgetl(fid); % Read fid file line by line.
+%        line =line+1;
+%        if contains(tline,'F') && size(str2double(regexp(tline,'[\d.]+','match')),2)==5 && contains (tline,'Z')
+%            linenumber(j,1)=line;
+%            
+%            j=j+1;
+%            
+%        end
+%  end    
+    
+ 
+
+%  figure (1),
+% axis ([150 175 110 130 0.1 0.4])
+% hold on
+%  for i=1:size(linenumber(:,1))
+% figure (i),
+% axis([150 175 110 130 0.1 0.4])
+% plot3(coordinates1(linenumber(i,1):linenumber(i+1,1),1),coordinates1(linenumber(i,1):linenumber(i+1,1),2),coordinates1(linenumber(i,1):linenumber(i+1,1),3))
+% rotate3d on
+% hold on
+% i=i+1
+% 
+%  end 
+
+    
+ 
+
+ 
+ 
+%      scatter(coordinates1(i,1),coordinates1(i,2),'filled');
+%      plot((coordinates1(i,1),coordinates1(i,2),'*');
+     
+%      axis square % or axis 
+%  time2=toc(time)/60
+%  time_next='TOTAL TIME'
+%  fpintf('%s=%f minutes\n',time_text)
+
+% figure (2);
+% axis ([150 175 110 130 0.1 0.4])
+% hold on
+%   
+% if coordinates1(i,3)~=coordinates1(i+1,3)
+%      for i=1:size(coordinates1,1)      
+%          fprintf
+%      plot(coordinates1(i,1),coordinates1(i,2),'*');  plot('rs') square 
+%      hold on
+%      axis equal % or axis square 
+%      xlabel('x'),ylabel('y'),zlabel('z')
+% end
+% end
+
+%   Plotting 
+%      x=coordinates1(i,1)
+%      y=coordinates1(i,2)
+%      z=coordinates1(i,3)
+%      plot3(x,y,z,'*')
+%      rotate3d on
+%      set(p,'LineStyle',
+%     plot3(coordinates1(i,1),coordinates1(i,2),coordinates1(i,3),'*');     
+      
+      
+% %  while  ischar('G1')
+% %         j=j+1;
+% %         tline=fgetl(fid);
+%                 if  strfind(tline,'F') & size(str2double(regexp(tline,'[\d.]+','match')),2)==3
+%                 tline=fgetl(fid);
+%                 j=j+1;
+%                 end
+%                 if  strfind(tline,'F') & size(str2double(regexp(tline,'[\d.]+','match')),2)==5
+%                     coord2=str2double(regexp(tline,'[\d.]+','match'))
+%                     coordinates(j,:)=coord2(1,3:4)
+%                    
+%                 end
+% 
+%                
+%          
+%                
+%                    tline=fgetline(fid);
+%                    j=j+1;
+%                  if strfind(tline,'X') & size(str2double(regexp(tline,'[\d.]+','match')),2)==4
+%                    coord3=str2double(regexp(tline,'[\d.]+','match'))
+%                    coord4(j,:)=coord3(1,2:4)                  % [coord3(1,2);coord3(1,3),coord(1,5)] z'yi çekebilmek için 
+%                
+% 
+% 
+%    
+
+
+
